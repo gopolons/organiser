@@ -74,6 +74,7 @@ export default function CompletedTab() {
     <SafeAreaProvider>
       <SafeAreaView style={globalStyles.container}>
         <SectionList
+          key={tasks.length === 0 ? "empty" : "populated"}
           sections={groupCompletedTasksByDate(tasks)}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
@@ -86,7 +87,11 @@ export default function CompletedTab() {
           renderSectionHeader={({ section: { title } }) => (
             <Text style={tableComponentsStyles.sectionHeader}>{title}</Text>
           )}
-          contentContainerStyle={!tasks.length && { flex: 1 }}
+          contentContainerStyle={
+            !tasks.length
+              ? { flex: 1, justifyContent: "center" }
+              : { paddingBottom: 80 }
+          }
           ListEmptyComponent={() => (
             <EmptyListView
               title="No Completed Tasks!"

@@ -1,10 +1,11 @@
 import { RecordingButton } from "@/components/appButton";
 import { TaskCell } from "@/components/taskCell";
+import { TaskData } from "@/model/task";
 import { OpenAIService } from "@/services/openai";
 import { AsyncTaskPersistence } from "@/services/persistence";
 import { RecordingServiceImplementation } from "@/services/recording";
 import { assistantTabStyles } from "@/styles/assistantTabStyles";
-import { TaskData } from "@/types/task";
+import { openAppSettings } from "@/utils/linkingUtils";
 import useAssistantTabViewModel from "@/viewmodels/useAssistantTabViewModel";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
@@ -39,6 +40,28 @@ export default function AssistantTab() {
       Alert.alert(
         "Error Processing Recording!",
         result.error ?? "Something went wrong. Please try again later."
+      );
+    }
+  }
+
+  // Function to request start recording with error handling (for example in case permission was not granted)
+  async function requestStartRecording() {
+    const result = await startRecording();
+    if (result?.permissionError || result?.error) {
+      Alert.alert(
+        "Error Starting Recording!",
+        result.permissionError ?? result.error,
+        // If it is a permission error, will show a button to redirect user to settings, otherwise show standard button
+        result.permissionError
+          ? [
+              {
+                text: "Go to settings",
+                onPress: () => {
+                  openAppSettings();
+                },
+              },
+            ]
+          : []
       );
     }
   }
@@ -205,7 +228,7 @@ export default function AssistantTab() {
       <View style={assistantTabStyles.recordingSection}>
         <RecordingButton
           isRecording={recorderState.isRecording}
-          onStartRecording={startRecording}
+          onStartRecording={requestStartRecording}
           onStopRecording={stopRecording}
           onCancelRecording={cancelRecording}
           disabled={loading}

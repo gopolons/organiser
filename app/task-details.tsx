@@ -1,7 +1,7 @@
 import { AppButton } from "@/components/appButton";
+import { TaskData } from "@/model/task";
 import { AsyncTaskPersistence } from "@/services/persistence";
 import { taskDetailsStyles } from "@/styles/taskDetailsStyles";
-import { TaskData } from "@/types/task";
 import { convertToISO8601, isOverdue } from "@/utils/dateUtils";
 import useTaskDetailsViewModel from "@/viewmodels/useTaskDetailsViewModel";
 import { Ionicons } from "@expo/vector-icons";

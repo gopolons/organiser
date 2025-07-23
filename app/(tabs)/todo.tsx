@@ -1,9 +1,9 @@
 import { EmptyListView } from "@/components/emptyListView";
 import { TaskCell } from "@/components/taskCell";
+import { TaskData } from "@/model/task";
 import { AsyncTaskPersistence } from "@/services/persistence";
 import { globalStyles } from "@/styles/globalStyles";
 import { tableComponentsStyles } from "@/styles/tableComponentsStyles";
-import { TaskData } from "@/types/task";
 import {
   groupUpcomingTasksByDate,
   toggleTaskCompletedOnView,

@@ -1,5 +1,5 @@
+import { TaskData } from "@/model/task";
 import { taskCellStyles as styles } from "@/styles/taskCellStyles";
-import { TaskData } from "@/types/task";
 import { isOverdue } from "@/utils/dateUtils";
 import { Ionicons } from "@expo/vector-icons";
 import { Text, TouchableOpacity, View } from "react-native";

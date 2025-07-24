@@ -11,8 +11,11 @@ export default function TabLayout() {
     router.push("/add-task");
   };
 
+  // Define the list of "tab" routes where the FAB should be visible
+  const tabRoutes = ["/completed", "/todo"];
+
   // Show FAB on all tabs except index
-  const shouldShowFab = pathname !== "/";
+  const shouldShowFab = tabRoutes.includes(pathname);
 
   return (
     <View style={{ flex: 1 }}>

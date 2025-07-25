@@ -33,6 +33,7 @@ struct TodoListCell: View {
                         .foregroundStyle(.red)
                 }
             }
+            .buttonStyle(.plain)
         }
     }
 }

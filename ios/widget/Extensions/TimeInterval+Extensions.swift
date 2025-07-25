@@ -16,7 +16,7 @@ extension TimeInterval {
         let startOfToday = calendar.startOfDay(for: Date())
         
         // Convert Unix timestamp to Date
-        let taskDueDate = Date(timeIntervalSince1970: self)
+        let taskDueDate = Date(timeIntervalSince1970: self / 1000)
         
         return taskDueDate < startOfToday
     }
@@ -29,14 +29,14 @@ extension TimeInterval {
         let startOfTomorrow = calendar.date(byAdding: .day, value: 1, to: calendar.startOfDay(for: Date()))!
         
         // Convert Unix timestamp to Date
-        let taskDueDate = Date(timeIntervalSince1970: self)
+        let taskDueDate = Date(timeIntervalSince1970: self / 1000)
         
         return taskDueDate < startOfTomorrow
     }
     
     /// Converts TimeInterval to a readable date format like "21 Jul" or "3 Jun"
     func toReadableDate() -> String {
-        let date = Date(timeIntervalSince1970: self)
+        let date = Date(timeIntervalSince1970: self / 1000)
         let formatter = DateFormatter()
         formatter.dateFormat = "d MMM"
         return formatter.string(from: date)

@@ -62,8 +62,8 @@ struct TodoListTimelineProvider: AppIntentTimelineProvider {
         
         let entry = TodoListEntry(date: .now, tasks: tasks, configuration: configuration)
         
-        // Update every 15 mins
-        let nextUpdate = Calendar.current.date(byAdding: .minute, value: 15, to: .now) ?? .now
+        // Update every 5s
+        let nextUpdate = Calendar.current.date(byAdding: .second, value: 5, to: .now) ?? .now
         return Timeline(entries: [entry], policy: .after(nextUpdate))
     }
 }

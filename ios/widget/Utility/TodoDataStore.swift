@@ -28,7 +28,7 @@ class TodoDataStore: ObservableObject {
     /// Private initializer assigning the user defaults property
     private init() {
         // FIXME: FIX WHEN EMBEDDING INTO THE APP
-        userDefaults = UserDefaults(suiteName: "com.georgiipolonskii.organiser") ?? .standard
+        userDefaults = UserDefaults(suiteName: "group.com.georgiipolonskii.organiser.shared") ?? .standard
     }
     
     /// Function for fetching tasks from UserDefaults

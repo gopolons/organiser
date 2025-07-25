@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 70;
+	objectVersion = 60;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -13,6 +13,8 @@
 		9426F3752E31AB5500EC01A2 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9426F3742E31AB5500EC01A2 /* WidgetKit.framework */; };
 		9426F3772E31AB5500EC01A2 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9426F3762E31AB5500EC01A2 /* SwiftUI.framework */; };
 		9426F3882E31AB5700EC01A2 /* widgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 9426F3732E31AB5500EC01A2 /* widgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		9426F3E52E32C2A200EC01A2 /* TaskSync.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9426F3E42E32C2A200EC01A2 /* TaskSync.swift */; };
+		9426F3E72E32C3B000EC01A2 /* TaskSync.m in Sources */ = {isa = PBXBuildFile; fileRef = 9426F3E62E32C3B000EC01A2 /* TaskSync.m */; };
 		AFAA350ECF6ABFC55049DA68 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 9E7F41E471CDFB168535011E /* PrivacyInfo.xcprivacy */; };
 		B5844D366BE6AB39EDC5FFAA /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8955A0BB49A51D914E7FBDA /* ExpoModulesProvider.swift */; };
 		BB2F792D24A3F905000567C9 /* Expo.plist in Resources */ = {isa = PBXBuildFile; fileRef = BB2F792C24A3F905000567C9 /* Expo.plist */; };
@@ -53,6 +55,9 @@
 		9426F3732E31AB5500EC01A2 /* widgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = widgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		9426F3742E31AB5500EC01A2 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		9426F3762E31AB5500EC01A2 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
+		9426F3E42E32C2A200EC01A2 /* TaskSync.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskSync.swift; sourceTree = "<group>"; };
+		9426F3E62E32C3B000EC01A2 /* TaskSync.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TaskSync.m; sourceTree = "<group>"; };
+		9426F3E82E32C97000EC01A2 /* widgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = widgetExtension.entitlements; sourceTree = "<group>"; };
 		9E7F41E471CDFB168535011E /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xml; name = PrivacyInfo.xcprivacy; path = Organiser/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = SplashScreen.storyboard; path = Organiser/SplashScreen.storyboard; sourceTree = "<group>"; };
 		BB2F792C24A3F905000567C9 /* Expo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Expo.plist; sourceTree = "<group>"; };
@@ -63,17 +68,36 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		9426F38C2E31AB5700EC01A2 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+		9426F38C2E31AB5700EC01A2 /* Exceptions for "widget" folder in "widgetExtension" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
 			);
 			target = 9426F3722E31AB5500EC01A2 /* widgetExtension */;
 		};
+		9426F3EA2E32D14700EC01A2 /* Exceptions for "widget" folder in "Organiser" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Model/TodoTask.swift,
+			);
+			target = 13B07F861A680F5B00A75B9A /* Organiser */;
+		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		9426F3782E31AB5500EC01A2 /* widget */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (9426F38C2E31AB5700EC01A2 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = widget; sourceTree = "<group>"; };
+		9426F3782E31AB5500EC01A2 /* widget */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				9426F3EA2E32D14700EC01A2 /* Exceptions for "widget" folder in "Organiser" target */,
+				9426F38C2E31AB5700EC01A2 /* Exceptions for "widget" folder in "widgetExtension" target */,
+			);
+			explicitFileTypes = {
+			};
+			explicitFolders = (
+			);
+			path = widget;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -107,6 +131,8 @@
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */,
 				9E7F41E471CDFB168535011E /* PrivacyInfo.xcprivacy */,
+				9426F3E42E32C2A200EC01A2 /* TaskSync.swift */,
+				9426F3E62E32C3B000EC01A2 /* TaskSync.m */,
 			);
 			name = Organiser;
 			sourceTree = "<group>";
@@ -157,6 +183,7 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
+				9426F3E82E32C97000EC01A2 /* widgetExtension.entitlements */,
 				13B07FAE1A68108700A75B9A /* Organiser */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				9426F3782E31AB5500EC01A2 /* widget */,
@@ -231,8 +258,6 @@
 				9426F3782E31AB5500EC01A2 /* widget */,
 			);
 			name = widgetExtension;
-			packageProductDependencies = (
-			);
 			productName = widgetExtension;
 			productReference = 9426F3732E31AB5500EC01A2 /* widgetExtension.appex */;
 			productType = "com.apple.product-type.app-extension";
@@ -416,7 +441,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				F11748422D0307B40044C1D9 /* AppDelegate.swift in Sources */,
+				9426F3E72E32C3B000EC01A2 /* TaskSync.m in Sources */,
 				B5844D366BE6AB39EDC5FFAA /* ExpoModulesProvider.swift in Sources */,
+				9426F3E52E32C2A200EC01A2 /* TaskSync.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -561,7 +588,10 @@
 				LIBRARY_SEARCH_PATHS = "$(SDKROOT)/usr/lib/swift\"$(inherited)\"";
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
-				OTHER_LDFLAGS = "$(inherited)  ";
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					" ",
+				);
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DEBUG";
@@ -616,7 +646,10 @@
 				);
 				LIBRARY_SEARCH_PATHS = "$(SDKROOT)/usr/lib/swift\"$(inherited)\"";
 				MTL_ENABLE_DEBUG_INFO = NO;
-				OTHER_LDFLAGS = "$(inherited)  ";
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					" ",
+				);
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				USE_HERMES = true;
@@ -638,6 +671,7 @@
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_ENTITLEMENTS = widgetExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = dwarf;
@@ -658,6 +692,7 @@
 				MARKETING_VERSION = 1.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
+				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_DEBUG";
 				PRODUCT_BUNDLE_IDENTIFIER = com.georgiipolonskii.organiser.widget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -683,6 +718,7 @@
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_ENTITLEMENTS = widgetExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
@@ -703,6 +739,7 @@
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MARKETING_VERSION = 1.0;
 				MTL_FAST_MATH = YES;
+				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_RELEASE";
 				PRODUCT_BUNDLE_IDENTIFIER = com.georgiipolonskii.organiser.widget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;

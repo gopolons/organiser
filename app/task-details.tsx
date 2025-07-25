@@ -190,6 +190,7 @@ export default function TaskDetailsView() {
             contentContainerStyle={taskDetailsStyles.scrollContent}
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="handled"
+            keyboardDismissMode="interactive"
           >
             {/* Task Title and Description */}
             <View style={taskDetailsStyles.taskContent}>

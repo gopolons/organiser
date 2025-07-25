@@ -70,6 +70,7 @@ export default function AddTaskView() {
             contentContainerStyle={addNewTaskStyles.scrollContent}
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="handled"
+            keyboardDismissMode="interactive"
           >
             {/* Header */}
             <View style={addNewTaskStyles.header}>

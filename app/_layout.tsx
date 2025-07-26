@@ -5,6 +5,7 @@ import { AppState } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 export default function RootLayout() {
+  // Sync widget data
   useEffect(() => {
     const handleAppStateChange = async (nextAppState: string) => {
       if (nextAppState === "active") {
@@ -33,6 +34,7 @@ export default function RootLayout() {
 
     return () => subscription?.remove();
   }, []);
+
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <Stack>

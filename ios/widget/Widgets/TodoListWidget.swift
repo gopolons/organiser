@@ -125,6 +125,7 @@ struct TodoListWidget: Widget {
         ) { entry in
             TodoListWidgetView(entry: entry)
                 .containerBackground(.background, for: .widget)
+                .dynamicTypeSize(.medium)
         }
         .configurationDisplayName("To Do List")
         .description("Quick access to your todo list - view tasks, and get quick access to adding new ones.")

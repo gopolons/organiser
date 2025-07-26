@@ -67,6 +67,7 @@ struct SimpleButtonsWidget: Widget {
         ) { entry in
             SimpleButtonsWidgetView(entry: entry)
                 .containerBackground(.background, for: .widget)
+                .dynamicTypeSize(.medium)
         }
         .configurationDisplayName("To Do Actions")
         .description("Quick access to your todo list actions - only first and second buttons available on small size")

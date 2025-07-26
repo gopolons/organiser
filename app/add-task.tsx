@@ -100,7 +100,6 @@ export default function AddTaskView() {
                 placeholder="Enter task description (optional)..."
                 multiline={true}
                 numberOfLines={4}
-                returnKeyType="done"
               />
             </View>
 

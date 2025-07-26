@@ -25,6 +25,7 @@ export const InputField = ({
         multiline && inputFieldStyles.multilineInput,
       ]}
       placeholder={placeholder}
+      placeholderTextColor={"#C7C7CD"}
       value={value}
       onChangeText={onChangeText}
       multiline={multiline}

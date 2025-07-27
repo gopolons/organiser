@@ -16,12 +16,10 @@ struct TodoListWidgetView: View {
     @Environment(\.widgetFamily) var family
     
     var body: some View {
-        VStack {
-            if entry.tasks.isEmpty {
-                noTasksRemainingPlaceholder
-            } else {
-                toDoListView
-            }
+        if entry.tasks.isEmpty {
+          noTasksRemainingPlaceholder
+        } else {
+          toDoListView
         }
     }
     

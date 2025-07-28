@@ -7,6 +7,7 @@
 
 import Foundation
 import React
+import WidgetKit
 
 /// Native module for writing to UserDefaults from React Native
 @objc(TaskSync)
@@ -23,6 +24,7 @@ class TaskSync: NSObject {
     
     if let data = tasks.data(using: .utf8) {
       userDefaults.set(data, forKey: "tasks")
+      WidgetCenter.shared.reloadAllTimelines()
     }
   }
   

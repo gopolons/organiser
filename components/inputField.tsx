@@ -1,4 +1,5 @@
-import { inputFieldStyles } from "@/styles/inputFieldStyles";
+import { createInputFieldStyles } from "@/styles/inputFieldStyles";
+import { useTheme } from "@/utils/theme";
 import { TextInput, TextInputProps } from "react-native";
 
 type Props = {
@@ -18,6 +19,10 @@ export const InputField = ({
   numberOfLines = 1,
   ...props
 }: Props) => {
+  // Theme declaration
+  const theme = useTheme();
+  const inputFieldStyles = createInputFieldStyles(theme);
+
   return (
     <TextInput
       style={[
@@ -25,7 +30,7 @@ export const InputField = ({
         multiline && inputFieldStyles.multilineInput,
       ]}
       placeholder={placeholder}
-      placeholderTextColor={"#C7C7CD"}
+      placeholderTextColor={theme.inputPlaceholder}
       value={value}
       onChangeText={onChangeText}
       multiline={multiline}

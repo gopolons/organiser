@@ -1,6 +1,7 @@
 import { TaskData } from "@/model/task";
-import { taskCellStyles as styles } from "@/styles/taskCellStyles";
+import { createTaskCellStyles } from "@/styles/taskCellStyles";
 import { isOverdue } from "@/utils/dateUtils";
+import { useTheme } from "@/utils/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { Text, TouchableOpacity, View } from "react-native";
 
@@ -17,6 +18,10 @@ export const TaskCell = ({
   toggleCompletionStatus,
   showTaskDetails,
 }: Props) => {
+  // Theme declaration
+  const theme = useTheme();
+  const styles = createTaskCellStyles(theme);
+
   const formatDueDate = (timestamp: number) => {
     const date = new Date(timestamp);
     return date.toLocaleDateString();
@@ -72,7 +77,7 @@ export const TaskCell = ({
             <Ionicons
               name="calendar-outline"
               size={14}
-              color={task.completed ? "#9CA3AF" : "#6B7280"}
+              color={task.completed ? theme.textDisabled : theme.textSecondary}
             />
             <Text
               style={[

@@ -1,4 +1,8 @@
-import { buttonStyles, recordingButtonStyles } from "@/styles/buttonStyles";
+import {
+  createButtonStyles,
+  createRecordingButtonStyles,
+} from "@/styles/buttonStyles";
+import { useTheme } from "@/utils/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { useEffect, useRef } from "react";
 import { Animated, Text, TouchableOpacity, View } from "react-native";
@@ -19,6 +23,10 @@ export const AppButton = ({
   onPress,
   disabled = false,
 }: Props) => {
+  // Theme declaration
+  const theme = useTheme();
+  const buttonStyles = createButtonStyles(theme);
+
   return (
     <TouchableOpacity
       style={[
@@ -51,6 +59,10 @@ export const RecordingButton = ({
   onCancelRecording,
   disabled = false,
 }: RecordingButtonProps) => {
+  // Theme declaration
+  const theme = useTheme();
+  const recordingButtonStyles = createRecordingButtonStyles(theme);
+
   const pulseAnim = useRef(new Animated.Value(1)).current;
   const scaleAnim = useRef(new Animated.Value(1)).current;
 

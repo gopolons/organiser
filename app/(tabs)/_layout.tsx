@@ -1,11 +1,17 @@
-import { globalStyles } from "@/styles/globalStyles";
+import { createGlobalStyles } from "@/styles/globalStyles";
+import { useTheme } from "@/utils/theme";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Tabs, usePathname, useRouter } from "expo-router";
 import { TouchableOpacity, View } from "react-native";
 
 export default function TabLayout() {
+  // Router declaration
   const router = useRouter();
   const pathname = usePathname();
+
+  // Theme declaration
+  const theme = useTheme();
+  const globalStyles = createGlobalStyles(theme);
 
   const handleAddTask = () => {
     router.push("/add-task");
@@ -19,7 +25,24 @@ export default function TabLayout() {
 
   return (
     <View style={{ flex: 1 }}>
-      <Tabs screenOptions={{ tabBarActiveTintColor: "#3B82F6" }}>
+      <Tabs
+        screenOptions={{
+          tabBarActiveTintColor: theme.primary,
+          tabBarInactiveTintColor: theme.textSecondary,
+          tabBarStyle: {
+            backgroundColor: theme.surface,
+            borderTopColor: theme.borderSecondary,
+            borderTopWidth: 1,
+          },
+          headerStyle: {
+            backgroundColor: theme.surface,
+          },
+          headerTintColor: theme.textPrimary,
+          headerTitleStyle: {
+            color: theme.textPrimary,
+          },
+        }}
+      >
         <Tabs.Screen
           name="index"
           options={{

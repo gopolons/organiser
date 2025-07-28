@@ -2,12 +2,13 @@ import { EmptyListView } from "@/components/emptyListView";
 import { TaskCell } from "@/components/taskCell";
 import { TaskData } from "@/model/task";
 import { AsyncTaskPersistence } from "@/services/persistence";
-import { globalStyles } from "@/styles/globalStyles";
-import { tableComponentsStyles } from "@/styles/tableComponentsStyles";
+import { createGlobalStyles } from "@/styles/globalStyles";
+import { createTableComponentsStyles } from "@/styles/tableComponentsStyles";
 import {
   groupUpcomingTasksByDate,
   toggleTaskCompletedOnView,
 } from "@/utils/taskUtils";
+import { useTheme } from "@/utils/theme";
 import useToDoTabViewModel from "@/viewmodels/useToDoTabViewModel";
 import { useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useState } from "react";
@@ -16,6 +17,11 @@ import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 
 // Tab where the user can see their upcoming to do tasks
 export default function ToDoTab() {
+  // Theme declaration
+  const theme = useTheme();
+  const globalStyles = createGlobalStyles(theme);
+  const tableComponentsStyles = createTableComponentsStyles(theme);
+
   // Router variable
   const router = useRouter();
   // State task variables which will be used for displaying and updating upcoming tasks

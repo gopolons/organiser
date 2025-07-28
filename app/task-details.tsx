@@ -1,8 +1,9 @@
 import { AppButton } from "@/components/appButton";
 import { TaskData } from "@/model/task";
 import { AsyncTaskPersistence } from "@/services/persistence";
-import { taskDetailsStyles } from "@/styles/taskDetailsStyles";
+import { createTaskDetailsStyles } from "@/styles/taskDetailsStyles";
 import { convertToISO8601, isOverdue } from "@/utils/dateUtils";
+import { useTheme } from "@/utils/theme";
 import useTaskDetailsViewModel from "@/viewmodels/useTaskDetailsViewModel";
 import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
@@ -21,6 +22,10 @@ import { Calendar } from "react-native-calendars";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 
 export default function TaskDetailsView() {
+  // Theme declaration
+  const theme = useTheme();
+  const taskDetailsStyles = createTaskDetailsStyles(theme);
+
   // Task ID acquired from the navigation path parameters
   const { taskID } = useLocalSearchParams<{ taskID: string }>();
 
@@ -167,7 +172,7 @@ export default function TaskDetailsView() {
           <View
             style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
           >
-            <Text style={{ fontSize: 16, color: "#6B7280" }}>
+            <Text style={{ fontSize: 16, color: theme.textSecondary }}>
               Loading task details...
             </Text>
           </View>
@@ -205,7 +210,9 @@ export default function TaskDetailsView() {
                       task.completed ? "checkmark-circle" : "ellipse-outline"
                     }
                     size={20}
-                    color={task.completed ? "#059669" : "#6B7280"}
+                    color={
+                      task.completed ? theme.completed : theme.textSecondary
+                    }
                   />
                 </TouchableOpacity>
                 <TextInput
@@ -222,7 +229,7 @@ export default function TaskDetailsView() {
                 <Ionicons
                   name="document-text-outline"
                   size={20}
-                  color="#9CA3AF"
+                  color={theme.textTertiary}
                   style={taskDetailsStyles.descriptionIcon}
                 />
                 <TextInput
@@ -239,7 +246,7 @@ export default function TaskDetailsView() {
               {/* Overdue Label */}
               {!task.completed && isOverdue(task.dueDate) && (
                 <View style={taskDetailsStyles.overdueLabel}>
-                  <Ionicons name="warning" size={16} color="#DC2626" />
+                  <Ionicons name="warning" size={16} color={theme.overdue} />
                   <Text style={taskDetailsStyles.overdueText}>Overdue</Text>
                 </View>
               )}
@@ -261,23 +268,23 @@ export default function TaskDetailsView() {
                     [convertToISO8601(dueDate)]: {
                       selected: true,
                       marked: true,
-                      selectedColor: "#3B82F6",
+                      selectedColor: theme.primary,
                     },
                   }}
                   theme={{
-                    backgroundColor: "#FFFFFF",
-                    calendarBackground: "#FFFFFF",
-                    textSectionTitleColor: "#374151",
-                    selectedDayBackgroundColor: "#3B82F6",
+                    backgroundColor: theme.calendarBackground,
+                    calendarBackground: theme.calendarBackground,
+                    textSectionTitleColor: theme.textPrimary,
+                    selectedDayBackgroundColor: theme.calendarSelected,
                     selectedDayTextColor: "#FFFFFF",
-                    todayTextColor: "#3B82F6",
-                    dayTextColor: "#1F2937",
-                    textDisabledColor: "#9CA3AF",
-                    dotColor: "#3B82F6",
+                    todayTextColor: theme.calendarToday,
+                    dayTextColor: theme.calendarText,
+                    textDisabledColor: theme.calendarDisabled,
+                    dotColor: theme.primary,
                     selectedDotColor: "#FFFFFF",
-                    arrowColor: "#3B82F6",
-                    monthTextColor: "#1F2937",
-                    indicatorColor: "#3B82F6",
+                    arrowColor: theme.primary,
+                    monthTextColor: theme.textPrimary,
+                    indicatorColor: theme.primary,
                     textDayFontWeight: "500",
                     textMonthFontWeight: "600",
                     textDayHeaderFontWeight: "600",

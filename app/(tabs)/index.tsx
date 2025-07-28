@@ -4,8 +4,9 @@ import { TaskData } from "@/model/task";
 import { OpenAIService } from "@/services/openai";
 import { AsyncTaskPersistence } from "@/services/persistence";
 import { RecordingServiceImplementation } from "@/services/recording";
-import { assistantTabStyles } from "@/styles/assistantTabStyles";
+import { createAssistantTabStyles } from "@/styles/assistantTabStyles";
 import { openAppSettings } from "@/utils/linkingUtils";
+import { useTheme } from "@/utils/theme";
 import useAssistantTabViewModel from "@/viewmodels/useAssistantTabViewModel";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
@@ -14,6 +15,10 @@ import { ActivityIndicator, Alert, FlatList, Text, View } from "react-native";
 import { Swipeable } from "react-native-gesture-handler";
 
 export default function AssistantTab() {
+  // Theme declaration
+  const theme = useTheme();
+  const assistantTabStyles = createAssistantTabStyles(theme);
+
   // Declare view state variables
   const [tasks, setTasks] = useState<TaskData[]>([]);
   // Declare variables from view model used to determine the state of the view & process data
@@ -136,7 +141,7 @@ export default function AssistantTab() {
           <Ionicons
             name="arrow-back"
             size={16}
-            color="#EF4444"
+            color={theme.error}
             style={assistantTabStyles.swipeInstructionIcon}
           />
           <Text style={assistantTabStyles.swipeInstructionTextRight}>
@@ -150,7 +155,7 @@ export default function AssistantTab() {
           <Ionicons
             name="arrow-forward"
             size={16}
-            color="#10B981"
+            color={theme.completed}
             style={assistantTabStyles.swipeInstructionIcon}
           />
         </View>
@@ -177,7 +182,7 @@ export default function AssistantTab() {
               alignItems: "center",
             }}
           >
-            <ActivityIndicator size={24} color="#3B82F6" />
+            <ActivityIndicator size={24} color={theme.primary} />
           </View>
         </View>
         <Text style={assistantTabStyles.loadingTitle}>
@@ -200,6 +205,7 @@ export default function AssistantTab() {
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => renderSwipeActions(item)}
             contentContainerStyle={assistantTabStyles.flatList}
+            style={{ backgroundColor: theme.background }}
             showsVerticalScrollIndicator={false}
             ItemSeparatorComponent={() => (
               <View style={assistantTabStyles.itemSeparator} />
@@ -212,14 +218,14 @@ export default function AssistantTab() {
           <Ionicons
             name="mic-outline"
             size={64}
-            color="#9CA3AF"
+            color={theme.textTertiary}
             style={assistantTabStyles.emptyStateIcon}
           />
           <Text style={assistantTabStyles.emptyStateText}>
             No tasks to display. Start recording to generate tasks!
           </Text>
           <Text style={assistantTabStyles.emptyStateSubtext}>
-            Swipe left to save • Swipe right to delete
+            Swipe left to delete • Swipe right to save
           </Text>
         </View>
       )}

@@ -1,8 +1,9 @@
 import { AppButton } from "@/components/appButton";
 import { InputField } from "@/components/inputField";
 import { AsyncTaskPersistence } from "@/services/persistence";
-import { addNewTaskStyles } from "@/styles/addNewTaskStyles";
+import { createAddNewTaskStyles } from "@/styles/addNewTaskStyles";
 import { convertToISO8601 } from "@/utils/dateUtils";
+import { useTheme } from "@/utils/theme";
 import useAddTaskViewModel from "@/viewmodels/useAddTaskViewModel";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
@@ -21,6 +22,10 @@ import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 export default function AddTaskView() {
   // Router declaration
   const router = useRouter();
+
+  // Theme declaration
+  const theme = useTheme();
+  const addNewTaskStyles = createAddNewTaskStyles(theme);
 
   // State task variables which will be used for collecting user input
   const [title, setTitle] = useState<string>("");
@@ -117,23 +122,23 @@ export default function AddTaskView() {
                     [convertToISO8601(dueDate)]: {
                       selected: true,
                       marked: true,
-                      selectedColor: "#3B82F6",
+                      selectedColor: theme.primary,
                     },
                   }}
                   theme={{
-                    backgroundColor: "#FFFFFF",
-                    calendarBackground: "#FFFFFF",
-                    textSectionTitleColor: "#374151",
-                    selectedDayBackgroundColor: "#3B82F6",
+                    backgroundColor: theme.calendarBackground,
+                    calendarBackground: theme.calendarBackground,
+                    textSectionTitleColor: theme.textPrimary,
+                    selectedDayBackgroundColor: theme.calendarSelected,
                     selectedDayTextColor: "#FFFFFF",
-                    todayTextColor: "#3B82F6",
-                    dayTextColor: "#1F2937",
-                    textDisabledColor: "#9CA3AF",
-                    dotColor: "#3B82F6",
+                    todayTextColor: theme.calendarToday,
+                    dayTextColor: theme.calendarText,
+                    textDisabledColor: theme.calendarDisabled,
+                    dotColor: theme.primary,
                     selectedDotColor: "#FFFFFF",
-                    arrowColor: "#3B82F6",
-                    monthTextColor: "#1F2937",
-                    indicatorColor: "#3B82F6",
+                    arrowColor: theme.primary,
+                    monthTextColor: theme.textPrimary,
+                    indicatorColor: theme.primary,
                     textDayFontWeight: "500",
                     textMonthFontWeight: "600",
                     textDayHeaderFontWeight: "600",
@@ -157,7 +162,11 @@ export default function AddTaskView() {
             {/* Form Validation Hint */}
             {!isFormValid && (
               <View style={addNewTaskStyles.validationHint}>
-                <Ionicons name="information-circle" size={20} color="#D97706" />
+                <Ionicons
+                  name="information-circle"
+                  size={20}
+                  color={theme.warning}
+                />
                 <Text style={addNewTaskStyles.validationText}>
                   Please enter a task title to continue
                 </Text>

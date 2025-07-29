@@ -1,4 +1,5 @@
 import { TaskData } from "@/model/task";
+import { isSimulator } from "@/utils/deviceUtils";
 import { NativeModules } from "react-native";
 
 const { TaskSync } = NativeModules;
@@ -7,6 +8,11 @@ const { TaskSync } = NativeModules;
 export class WidgetService {
   // Syncs provided tasks with User Defaults
   static async syncTasksToWidget(tasks: TaskData[]) {
+    // Check if the device is simulator
+    if (await isSimulator()) {
+      return;
+    }
+
     try {
       const widgetTasks = tasks.map((task) => ({
         id: task.id,
@@ -26,6 +32,11 @@ export class WidgetService {
 
   // Fetches tasks from user defaults
   static async getTasksFromWidget(): Promise<TaskData[]> {
+    // Check if the device is simulator
+    if (await isSimulator()) {
+      return [];
+    }
+
     return new Promise((resolve, reject) => {
       TaskSync.getTasksFromWidget((error: any, result: string) => {
         if (error) {

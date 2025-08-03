@@ -1,59 +1,21 @@
 {
+  "name": "Organiser",
+  "slug": "Organiser",
+  "version": "1.0.0",
+  "web": {
+    "bundler": "metro",
+    "output": "static",
+    "favicon": "./assets/images/favicon.png"
+  },
+  "extra": {
+    "router": {}
+  },
   "expo": {
-    "name": "Organiser",
-    "slug": "Organiser",
-    "version": "1.0.0",
-    "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
     "scheme": "organiser",
-    "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
-    "ios": {
-      "supportsTablet": true,
-      "bundleIdentifier": "com.georgiipolonskii.organiser",
-      "entitlements": {
-        "com.apple.security.application-groups": [
-          "group.com.georgiipolonskii.organiser.widget"
-        ]
+    "extra": {
+      "eas": {
+        "projectId": "e7b85d67-e1c0-4cf9-b330-8d8a9d6bf360"
       }
-    },
-    "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      },
-      "edgeToEdgeEnabled": true,
-      "permissions": [
-        "android.permission.RECORD_AUDIO",
-        "android.permission.MODIFY_AUDIO_SETTINGS"
-      ],
-      "package": "com.georgiipolonskii.organiser"
-    },
-    "web": {
-      "bundler": "metro",
-      "output": "static",
-      "favicon": "./assets/images/favicon.png"
-    },
-    "plugins": [
-      [
-        "expo-audio",
-        {
-          "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone to transcribe your conversations with the assistant."
-        }
-      ],
-      "expo-router",
-      [
-        "expo-splash-screen",
-        {
-          "image": "./assets/images/splash-icon.png",
-          "imageWidth": 200,
-          "resizeMode": "contain",
-          "backgroundColor": "#ffffff"
-        }
-      ]
-    ],
-    "experiments": {
-      "typedRoutes": true
     }
   }
 }

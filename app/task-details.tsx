@@ -199,22 +199,14 @@ export default function TaskDetailsView() {
           >
             {/* Task Title and Description */}
             <View style={taskDetailsStyles.taskContent}>
+              {/* Title Input with an icon */}
               <View style={taskDetailsStyles.titleRow}>
-                <TouchableOpacity
-                  style={taskDetailsStyles.statusButton}
-                  onPress={handleToggleStatus}
-                  disabled={loading}
-                >
-                  <Ionicons
-                    name={
-                      task.completed ? "checkmark-circle" : "ellipse-outline"
-                    }
-                    size={20}
-                    color={
-                      task.completed ? theme.completed : theme.textSecondary
-                    }
-                  />
-                </TouchableOpacity>
+                <Ionicons
+                  name="text"
+                  size={20}
+                  color={theme.textTertiary}
+                  style={taskDetailsStyles.titleIcon}
+                />
                 <TextInput
                   style={taskDetailsStyles.taskTitle}
                   value={name}
@@ -222,9 +214,11 @@ export default function TaskDetailsView() {
                   placeholder="Enter task name..."
                   placeholderTextColor={taskDetailsStyles.placeholderText.color}
                   editable={true}
-                  multiline={false}
+                  multiline={true}
+                  textAlignVertical="top"
                 />
               </View>
+
               <View style={taskDetailsStyles.descriptionRow}>
                 <Ionicons
                   name="document-text-outline"
@@ -254,6 +248,32 @@ export default function TaskDetailsView() {
 
             {/* Divider */}
             <View style={taskDetailsStyles.divider} />
+
+            {/* Status Button - Moved underneath divider */}
+            <View style={taskDetailsStyles.statusSection}>
+              <TouchableOpacity
+                style={taskDetailsStyles.statusButton}
+                onPress={handleToggleStatus}
+                disabled={loading}
+              >
+                <View style={taskDetailsStyles.statusContent}>
+                  <Ionicons
+                    name={
+                      task.completed ? "checkmark-circle" : "ellipse-outline"
+                    }
+                    size={20}
+                    color={
+                      task.completed ? theme.completed : theme.textSecondary
+                    }
+                  />
+                  <Text
+                    style={[taskDetailsStyles.statusText, statusInfo.color]}
+                  >
+                    {statusInfo.text}
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            </View>
 
             {/* Calendar Section */}
             <View style={taskDetailsStyles.calendarSection}>

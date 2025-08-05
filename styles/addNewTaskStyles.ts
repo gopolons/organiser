@@ -12,6 +12,7 @@ export const createAddNewTaskStyles = (theme: ThemeColors) =>
     },
     scrollContent: {
       padding: 20,
+      paddingBottom: 100, // Extra padding for keyboard accessibility
     },
     header: {
       marginBottom: 32,

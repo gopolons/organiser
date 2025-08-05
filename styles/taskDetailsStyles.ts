@@ -12,6 +12,7 @@ export const createTaskDetailsStyles = (theme: ThemeColors) =>
     },
     scrollContent: {
       padding: 20,
+      paddingBottom: 120, // Extra padding to ensure delete button is accessible with keyboard
     },
     header: {
       marginBottom: 32,
@@ -36,6 +37,8 @@ export const createTaskDetailsStyles = (theme: ThemeColors) =>
       color: theme.textPrimary,
       lineHeight: 32,
       marginBottom: 8,
+      flex: 1,
+      paddingHorizontal: 0,
     },
     taskDescription: {
       fontSize: 16,
@@ -49,8 +52,11 @@ export const createTaskDetailsStyles = (theme: ThemeColors) =>
       alignItems: "center",
       marginBottom: 12,
     },
-    statusButton: {
+    titleIcon: {
       marginRight: 8,
+    },
+    statusButton: {
+      marginBottom: 8,
       padding: 0,
     },
     descriptionRow: {
@@ -151,6 +157,11 @@ export const createTaskDetailsStyles = (theme: ThemeColors) =>
       shadowOpacity: 0.05,
       shadowRadius: 2,
       elevation: 2,
+    },
+    statusContent: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 8,
     },
     statusText: {
       fontSize: 16,

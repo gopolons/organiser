@@ -55,9 +55,8 @@ extension TodoListWidgetView {
     
     /// A component describing the todo list view
     private var toDoListView: some View {
-        ZStack {
+        VStack {
             widgetHeader
-                .frame(maxHeight: .infinity, alignment: .top)
             
             VStack {
                 ForEach(Array(entry.tasks.prefix(maxTasks).enumerated()), id: \.element.id) { index, task in
@@ -69,7 +68,7 @@ extension TodoListWidgetView {
                     }
                 }
             }
-            .frame(maxHeight: .infinity, alignment: .bottom)
+            .frame(maxHeight: .infinity, alignment: .top)
         }
     }
     
@@ -87,7 +86,7 @@ extension TodoListWidgetView {
     /// A component describing the remaining tasks label in header
     private var remainingTasksLabel: some View {
         HStack {
-            Text("Remaining tasks:")
+            Text("Tasks for today:")
                 .bold()
             
             Text(String(entry.tasks.count))
@@ -134,11 +133,11 @@ struct TodoListWidget: Widget {
 #Preview(as: .systemMedium) {
     TodoListWidget()
 } timeline: {
-    TodoListEntry(date: .now, tasks: sampleTasks, configuration: .init())
+    TodoListEntry(date: .now, tasks: Array(sampleTasks.prefix(1)), configuration: .init())
 }
 
 #Preview(as: .systemLarge) {
     TodoListWidget()
 } timeline: {
-    TodoListEntry(date: .now, tasks: sampleTasks, configuration: .init())
+    TodoListEntry(date: .now, tasks: Array(sampleTasks.prefix(10)), configuration: .init())
 }

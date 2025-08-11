@@ -53,7 +53,23 @@ export async function syncFromWidget(): Promise<void> {
 
 async function loadTasks(): Promise<TaskData[]> {
   const json = await AsyncStorage.getItem(TASKS_KEY);
-  return json ? JSON.parse(json) : [];
+  // Check that the json is not empty
+  if (!json) {
+    return [];
+  }
+
+  const rawTasks = JSON.parse(json);
+
+  const tasks = rawTasks.map((task: any) => ({
+    id: task.id,
+    name: task.name,
+    description: task.description,
+    dueDate: task.dueDate,
+    completed: task.completed,
+    tags: task.tags || [],
+  }));
+
+  return tasks;
 }
 
 async function saveTasks(tasks: TaskData[]): Promise<void> {

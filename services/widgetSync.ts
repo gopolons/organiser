@@ -20,6 +20,7 @@ export class WidgetService {
         description: task.description,
         dueDate: task.dueDate,
         completed: task.completed,
+        tags: task.tags,
       }));
 
       const tasksJson = JSON.stringify(widgetTasks);
@@ -55,6 +56,7 @@ export class WidgetService {
             description: task.description,
             completed: task.completed,
             dueDate: task.dueDate * 1000,
+            tags: task.tags || [],
           }));
 
           resolve(tasks);

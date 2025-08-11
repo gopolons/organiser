@@ -12,7 +12,8 @@ export default function useAddTaskViewModel(persistence: TaskPersistence) {
   const addNewTaskToPersistence = async (
     name: string,
     description: string,
-    dueDate: number
+    dueDate: number,
+    tags: string[],
   ) => {
     setLoading(true);
     const task: TaskData = {
@@ -21,6 +22,7 @@ export default function useAddTaskViewModel(persistence: TaskPersistence) {
       description: description,
       dueDate: dueDate,
       completed: false,
+      tags: tags,
     };
     try {
       await persistence.addTask(task);

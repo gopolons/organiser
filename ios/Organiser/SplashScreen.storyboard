@@ -41,7 +41,7 @@
     <resources>
         <image name="AppLogo" width="341.33334350585938" height="341.33334350585938"/>
         <namedColor name="SplashScreenBackground">
-            <color red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.94901967050000002" green="0.94901967050000002" blue="0.94901967050000002" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
         </namedColor>
     </resources>
 </document>

@@ -100,6 +100,31 @@ export const createTaskDetailsStyles = (theme: ThemeColors) =>
       textTransform: "uppercase",
       letterSpacing: 0.5,
     },
+    tagsContainer: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      marginTop: 8,
+    },
+    tagChip: {
+      flexDirection: "row",
+      alignItems: "center",
+      backgroundColor: theme.surfaceSecondary,
+      borderColor: theme.borderSecondary,
+      borderWidth: 1,
+      borderRadius: 16,
+      paddingVertical: 6,
+      paddingHorizontal: 10,
+      marginRight: 8,
+      marginBottom: 8,
+    },
+    tagText: {
+      color: theme.textSecondary,
+      fontSize: 13,
+      marginRight: 6,
+    },
+    tagRemoveIcon: {
+      padding: 2,
+    },
     editableField: {
       fontSize: 16,
       color: theme.textPrimary,

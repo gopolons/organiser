@@ -14,4 +14,5 @@ struct TodoTask: Identifiable, Codable {
     let description: String
     let dueDate: TimeInterval
     var completed: Bool
+    var tags: [String]
 }

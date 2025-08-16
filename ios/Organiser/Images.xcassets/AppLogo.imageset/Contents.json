@@ -1,7 +1,7 @@
 {
   "images" : [
     {
-      "filename" : "IMG_5681.png",
+      "filename" : "IMG_5681 7.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
@@ -12,7 +12,7 @@
           "value" : "light"
         }
       ],
-      "filename" : "IMG_5681 1.png",
+      "filename" : "IMG_5681 6.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
@@ -23,7 +23,7 @@
           "value" : "dark"
         }
       ],
-      "filename" : "IMG_5681 2.png",
+      "filename" : "IMG_5681 9.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
@@ -50,7 +50,7 @@
           "value" : "dark"
         }
       ],
-      "filename" : "IMG_5681 7.png",
+      "filename" : "IMG_5681 10.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
@@ -66,7 +66,7 @@
           "value" : "light"
         }
       ],
-      "filename" : "IMG_5681 6.png",
+      "filename" : "IMG_5681 2.png",
       "idiom" : "universal",
       "scale" : "3x"
     },

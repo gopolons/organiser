@@ -1,5 +1,6 @@
 import { AppButton } from "@/components/appButton";
 import { TaskData } from "@/model/task";
+import { InputField } from "@/components/inputField";
 import { AsyncTaskPersistence } from "@/services/persistence";
 import { createTaskDetailsStyles } from "@/styles/taskDetailsStyles";
 import { convertToISO8601, isOverdue } from "@/utils/dateUtils";
@@ -34,6 +35,8 @@ export default function TaskDetailsView() {
   const [name, setName] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [dueDate, setDueDate] = useState<number>(Date.now());
+  const [tags, setTags] = useState<string[]>([]);
+  const [tagText, setTagText] = useState<string>("");
 
   // View model variables for fetching and manipulating data
   const {
@@ -44,7 +47,7 @@ export default function TaskDetailsView() {
     loading,
   } = useTaskDetailsViewModel(
     // NOTE: Can be replaced with DummyTaskPersistence for debug purposes
-    AsyncTaskPersistence
+    AsyncTaskPersistence,
   );
 
   // Function for fetching task details from persistence
@@ -55,6 +58,7 @@ export default function TaskDetailsView() {
       setName(response.data.name);
       setDescription(response.data.description);
       setDueDate(response.data.dueDate);
+      setTags(response.data.tags);
     } else {
       Alert.alert(
         "Error Fetching Task Details!",
@@ -66,7 +70,7 @@ export default function TaskDetailsView() {
               router.back();
             },
           },
-        ]
+        ],
       );
     }
   }
@@ -79,12 +83,13 @@ export default function TaskDetailsView() {
     task.name = name;
     task.description = description;
     task.dueDate = dueDate;
+    task.tags = tags;
     // Update task details in persistence
     const response = await updateTaskDetails(task);
     if (!response.success) {
       Alert.alert(
         "Error Updating Task Details!",
-        response.error || "Something went wrong. Please try again later."
+        response.error || "Something went wrong. Please try again later.",
       );
     }
   }
@@ -102,7 +107,7 @@ export default function TaskDetailsView() {
     } else {
       Alert.alert(
         "Error Updating Task Status!",
-        response.error || "Something went wrong. Please try again later."
+        response.error || "Something went wrong. Please try again later.",
       );
     }
   }
@@ -130,13 +135,46 @@ export default function TaskDetailsView() {
               Alert.alert(
                 "Error Deleting Task!",
                 response.error ||
-                  "Something went wrong. Please try again later."
+                  "Something went wrong. Please try again later.",
               );
             }
           },
         },
-      ]
+      ],
     );
+  }
+
+  // Tag helpers
+  function commitTagsFromText(text: string) {
+    const newTags = text.trim().split(/\s+/).filter(Boolean);
+    if (newTags.length === 0) return;
+    setTags((prev) => Array.from(new Set([...prev, ...newTags])));
+  }
+
+  function handleTagInputChange(text: string) {
+    if (/\s$/.test(text)) {
+      commitTagsFromText(text);
+      setTagText("");
+    } else {
+      setTagText(text);
+    }
+  }
+
+  function handleTagSubmit() {
+    if (tagText.trim().length > 0) {
+      commitTagsFromText(tagText + " ");
+      setTagText("");
+    }
+  }
+
+  function removeTag(tagToRemove: string) {
+    setTags((prev) => prev.filter((t) => t !== tagToRemove));
+  }
+
+  function beginEditTag(tagToEdit: string) {
+    // Move tag into input for editing
+    setTags((prev) => prev.filter((t) => t !== tagToEdit));
+    setTagText(tagToEdit);
   }
 
   // Function to get status text and color
@@ -163,7 +201,7 @@ export default function TaskDetailsView() {
     if (task) {
       storeTaskDetails();
     }
-  }, [name, description, dueDate]);
+  }, [name, description, dueDate, tags]);
 
   if (!task) {
     return (
@@ -237,13 +275,6 @@ export default function TaskDetailsView() {
                   textAlignVertical="top"
                 />
               </View>
-              {/* Overdue Label */}
-              {!task.completed && isOverdue(task.dueDate) && (
-                <View style={taskDetailsStyles.overdueLabel}>
-                  <Ionicons name="warning" size={16} color={theme.overdue} />
-                  <Text style={taskDetailsStyles.overdueText}>Overdue</Text>
-                </View>
-              )}
             </View>
 
             {/* Divider */}
@@ -273,6 +304,38 @@ export default function TaskDetailsView() {
                   </Text>
                 </View>
               </TouchableOpacity>
+              {/* Tags Section */}
+              <View style={{ marginTop: 12 }}>
+                <Text style={taskDetailsStyles.fieldLabel}>Tags</Text>
+                <InputField
+                  value={tagText}
+                  onChangeText={handleTagInputChange}
+                  onSubmitEditing={handleTagSubmit}
+                  placeholder="Type a tag and press space"
+                  returnKeyType="done"
+                />
+                {tags.length > 0 && (
+                  <View style={taskDetailsStyles.tagsContainer}>
+                    {tags.map((tag) => (
+                      <View key={tag} style={taskDetailsStyles.tagChip}>
+                        <Text
+                          style={taskDetailsStyles.tagText}
+                          onPress={() => beginEditTag(tag)}
+                        >
+                          {tag}
+                        </Text>
+                        <Ionicons
+                          name="close"
+                          size={14}
+                          color={theme.textTertiary}
+                          onPress={() => removeTag(tag)}
+                          style={taskDetailsStyles.tagRemoveIcon}
+                        />
+                      </View>
+                    ))}
+                  </View>
+                )}
+              </View>
             </View>
 
             {/* Calendar Section */}

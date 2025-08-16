@@ -10,10 +10,16 @@ import {
 } from "@/utils/taskUtils";
 import { useTheme } from "@/utils/theme";
 import useToDoTabViewModel from "@/viewmodels/useToDoTabViewModel";
-import { useFocusEffect, useRouter } from "expo-router";
-import { useCallback, useState } from "react";
-import { Alert, SectionList, Text } from "react-native";
-import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
+import { useFocusEffect, useRouter, useNavigation } from "expo-router";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { Alert, SectionList, Text, View } from "react-native";
+import {
+  SafeAreaProvider,
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
+import FilterButton from "@/components/filterButton";
+import FilterSheet from "@/components/filterSheet";
 
 // Tab where the user can see their upcoming to do tasks
 export default function ToDoTab() {
@@ -21,16 +27,25 @@ export default function ToDoTab() {
   const theme = useTheme();
   const globalStyles = createGlobalStyles(theme);
   const tableComponentsStyles = createTableComponentsStyles(theme);
+  const insets = useSafeAreaInsets();
 
+  // Navigation variable
+  const navigation = useNavigation();
   // Router variable
   const router = useRouter();
   // State task variables which will be used for displaying and updating upcoming tasks
   const [tasks, setTasks] = useState<TaskData[] | []>([]);
+  // State tags variable which will keep all of the present tags that the user can sort existing tags by
+  const [tags, setTags] = useState<string[]>([]);
+  // Filter UI state
+  const [isFilterVisible, setFilterVisible] = useState(false);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+
   // View model variables for fetching and manipulating data
   const { fetchIncompleteTasksFromPersistence, toggleTaskStatus, loading } =
     useToDoTabViewModel(
       // NOTE: Can be replaced with DummyTaskPersistence for debug purposes
-      AsyncTaskPersistence
+      AsyncTaskPersistence,
     );
 
   // Function for fetching task data from view model
@@ -38,12 +53,33 @@ export default function ToDoTab() {
     const response = await fetchIncompleteTasksFromPersistence();
     if (response.success && response.data) {
       setTasks(response.data);
+      // Collect tags from the fetched tasks
+      collectTags(response.data);
     } else {
       Alert.alert(
         "Error fetching tasks from persistence!",
-        response.error || "Something went wrong, please try again later."
+        response.error || "Something went wrong, please try again later.",
       );
     }
+  }
+
+  // Derived tasks based on selected tags
+  const filteredTasks = useMemo(() => {
+    if (selectedTags.length === 0) return tasks;
+    return tasks.filter((task) =>
+      task.tags.some((tag) => selectedTags.includes(tag)),
+    );
+  }, [tasks, selectedTags]);
+
+  // Function for collecting tags from tasks when the view appears
+  async function collectTags(todos: TaskData[]) {
+    const tagSet = new Set<string>();
+    todos.forEach((element) => {
+      element.tags.forEach((tag) => {
+        tagSet.add(tag);
+      });
+    });
+    setTags(Array.from(tagSet));
   }
 
   // Function for updating task status in view model
@@ -56,7 +92,7 @@ export default function ToDoTab() {
     } else {
       Alert.alert(
         "Error updating task status!",
-        response.error || "Something went wrong, please try again later."
+        response.error || "Something went wrong, please try again later.",
       );
     }
   }
@@ -73,15 +109,54 @@ export default function ToDoTab() {
   useFocusEffect(
     useCallback(() => {
       fetchData();
-    }, [])
+    }, []),
   );
+
+  // Update header filter button (with badge) when tasks or selected tags change
+  useEffect(() => {
+    navigation.setOptions({
+      headerRight: () =>
+        tasks.length > 0 ? (
+          <View style={{ marginRight: 8 }}>
+            <FilterButton
+              badgeCount={selectedTags.length}
+              onPress={() => setFilterVisible(true)}
+              accessibilityLabel="Filter tasks"
+              accessibilityHint="Opens filter selection"
+            />
+          </View>
+        ) : null,
+    });
+  }, [navigation, tasks, selectedTags]);
+
+  // Ensure tags are kept in sync when task list changes (covers any changes beyond initial fetch)
+  useEffect(() => {
+    collectTags(tasks);
+  }, [tasks]);
+
+  // Function for selecting tags on filter sheet
+  function toggleTagSelection(tag: string) {
+    setSelectedTags((prev) =>
+      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag],
+    );
+  }
 
   return (
     <SafeAreaProvider>
       <SafeAreaView style={globalStyles.container}>
+        <FilterSheet
+          visible={isFilterVisible}
+          tags={tags}
+          selectedTags={selectedTags}
+          insets={insets}
+          onToggleTag={toggleTagSelection}
+          onClear={() => setSelectedTags([])}
+          onClose={() => setFilterVisible(false)}
+        />
+
         <SectionList
-          key={tasks.length === 0 ? "empty" : "populated"}
-          sections={groupUpcomingTasksByDate(tasks)}
+          key={filteredTasks.length === 0 ? "empty" : "populated"}
+          sections={groupUpcomingTasksByDate(filteredTasks)}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
             <TaskCell
@@ -94,7 +169,7 @@ export default function ToDoTab() {
             <Text style={tableComponentsStyles.sectionHeader}>{title}</Text>
           )}
           contentContainerStyle={
-            !tasks.length
+            !filteredTasks.length
               ? { flex: 1, justifyContent: "center" }
               : { paddingBottom: 80 }
           }
@@ -105,7 +180,7 @@ export default function ToDoTab() {
               iconName="trophy"
             />
           )}
-          scrollEnabled={!!tasks.length}
+          scrollEnabled={!!filteredTasks.length}
         />
       </SafeAreaView>
     </SafeAreaProvider>

@@ -31,11 +31,13 @@ export default function AddTaskView() {
   const [title, setTitle] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [dueDate, setDueDate] = useState<number>(Date.now());
+  const [tags, setTags] = useState<string[]>([]);
+  const [tagText, setTagText] = useState<string>("");
 
   // View model variables for fetching and manipulating data
   const { addNewTaskToPersistence, loading } = useAddTaskViewModel(
     // NOTE: Can be replaced with DummyTaskPersistence for debug purposes
-    AsyncTaskPersistence
+    AsyncTaskPersistence,
   );
 
   // A function for saving the task into the persistent storage via view model
@@ -45,7 +47,12 @@ export default function AddTaskView() {
       return;
     }
 
-    const response = await addNewTaskToPersistence(title, description, dueDate);
+    const response = await addNewTaskToPersistence(
+      title,
+      description,
+      dueDate,
+      tags,
+    );
     if (response.success && response.data) {
       // Redirect the user to the page with new task details
       router.replace({
@@ -55,9 +62,36 @@ export default function AddTaskView() {
     } else {
       Alert.alert(
         "Error Adding Task!",
-        response.error || "Something went wrong. Please try again later."
+        response.error || "Something went wrong. Please try again later.",
       );
     }
+  }
+
+  // Tag helpers
+  function commitTagsFromText(text: string) {
+    const newTags = text.trim().split(/\s+/).filter(Boolean);
+    if (newTags.length === 0) return;
+    setTags((prev) => Array.from(new Set([...prev, ...newTags])));
+  }
+
+  function handleTagInputChange(text: string) {
+    if (/\s$/.test(text)) {
+      commitTagsFromText(text);
+      setTagText("");
+    } else {
+      setTagText(text);
+    }
+  }
+
+  function handleTagSubmit() {
+    if (tagText.trim().length > 0) {
+      commitTagsFromText(tagText + " ");
+      setTagText("");
+    }
+  }
+
+  function removeTag(tagToRemove: string) {
+    setTags((prev) => prev.filter((t) => t !== tagToRemove));
   }
 
   // A quick FLV check to see if the form is valid
@@ -106,6 +140,34 @@ export default function AddTaskView() {
                 multiline={true}
                 numberOfLines={4}
               />
+            </View>
+
+            {/* Tags Section */}
+            <View style={addNewTaskStyles.inputSection}>
+              <Text style={addNewTaskStyles.inputLabel}>Tags</Text>
+              <InputField
+                value={tagText}
+                onChangeText={handleTagInputChange}
+                onSubmitEditing={handleTagSubmit}
+                placeholder="Type a tag and press space"
+                returnKeyType="done"
+              />
+              {tags.length > 0 && (
+                <View style={addNewTaskStyles.tagsContainer}>
+                  {tags.map((tag) => (
+                    <View key={tag} style={addNewTaskStyles.tagChip}>
+                      <Text style={addNewTaskStyles.tagText}>{tag}</Text>
+                      <Ionicons
+                        name="close"
+                        size={14}
+                        color={theme.textTertiary}
+                        onPress={() => removeTag(tag)}
+                        style={addNewTaskStyles.tagRemoveIcon}
+                      />
+                    </View>
+                  ))}
+                </View>
+              )}
             </View>
 
             {/* Due Date Section */}

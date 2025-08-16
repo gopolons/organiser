@@ -4,6 +4,7 @@ export type TaskData = {
   description: string;
   dueDate: number;
   completed: boolean;
+  tags: string[];
 };
 
 export type TaskSection = {

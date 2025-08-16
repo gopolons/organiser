@@ -93,9 +93,9 @@ export function groupCompletedTasksByDate(tasks: TaskData[]): TaskSection[] {
 // Function which will update task in place (to be used in views)
 export function toggleTaskCompletedOnView(
   tasks: TaskData[],
-  id: string
+  id: string,
 ): TaskData[] {
   return tasks.map((task) =>
-    task.id === id ? { ...task, completed: !task.completed } : task
+    task.id === id ? { ...task, completed: !task.completed } : task,
   );
 }

@@ -38,7 +38,7 @@ export default function RootLayout() {
     // Listen for app coming to foreground
     const subscription = AppState.addEventListener(
       "change",
-      handleAppStateChange
+      handleAppStateChange,
     );
 
     return () => subscription?.remove();

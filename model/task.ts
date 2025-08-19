@@ -5,6 +5,7 @@ export type TaskData = {
   dueDate: number;
   completed: boolean;
   tags: string[];
+  order: number;
 };
 
 export type TaskSection = {

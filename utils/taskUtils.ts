@@ -48,7 +48,12 @@ export function groupUpcomingTasksByDate(tasks: TaskData[]): TaskSection[] {
 
   // Add appropriate sections
   if (overdue.length) sections.push({ title: "Overdue", data: overdue });
-  if (today.length) sections.push({ title: "Today", data: today });
+  // Ensure today's tasks are consistently ordered by their 'order' field
+  if (today.length)
+    sections.push({
+      title: "Today",
+      data: [...today].sort((a, b) => (a.order ?? 0) - (b.order ?? 0)),
+    });
   if (tomorrow.length) sections.push({ title: "Tomorrow", data: tomorrow });
   if (comingUp.length) sections.push({ title: "Coming Up", data: comingUp });
 

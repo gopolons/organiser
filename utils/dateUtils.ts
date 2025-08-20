@@ -1,4 +1,13 @@
 import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+
+dayjs.extend(utc);
+
+// Function for getting the start of today's date
+export function getStartOfToday(): number {
+  // Return milliseconds since epoch for consistency with stored dueDate
+  return dayjs().utc(false).startOf("day").valueOf();
+}
 
 // Function which returns true if the timestamp is now today or in the future
 export function isOverdue(timestamp: number): boolean {

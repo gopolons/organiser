@@ -10,6 +10,7 @@ type Props = {
   task: TaskData;
   toggleCompletionStatus: () => void;
   showTaskDetails: () => void;
+  onLongPress?: () => void;
 };
 
 // A cell displaying task data
@@ -17,6 +18,7 @@ export const TaskCell = ({
   task,
   toggleCompletionStatus,
   showTaskDetails,
+  onLongPress,
 }: Props) => {
   // Theme declaration
   const theme = useTheme();
@@ -35,6 +37,7 @@ export const TaskCell = ({
         isOverdue(task.dueDate) && styles.overdueContainer,
       ]}
       onPress={() => showTaskDetails()}
+      onLongPress={onLongPress}
       activeOpacity={0.7}
     >
       <View style={styles.content}>

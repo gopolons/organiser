@@ -21,6 +21,7 @@ export class WidgetService {
         dueDate: task.dueDate,
         completed: task.completed,
         tags: task.tags,
+        order: 0,
       }));
 
       const tasksJson = JSON.stringify(widgetTasks);
@@ -57,6 +58,7 @@ export class WidgetService {
             completed: task.completed,
             dueDate: task.dueDate * 1000,
             tags: task.tags || [],
+            order: task.order ?? 0,
           }));
 
           resolve(tasks);

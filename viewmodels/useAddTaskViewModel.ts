@@ -23,6 +23,7 @@ export default function useAddTaskViewModel(persistence: TaskPersistence) {
       dueDate: dueDate,
       completed: false,
       tags: tags,
+      order: 0,
     };
     try {
       await persistence.addTask(task);

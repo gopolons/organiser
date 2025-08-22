@@ -12,6 +12,7 @@ export interface TaskPersistence {
   getTaskById(id: string): Promise<TaskData>;
   updateTask(task: TaskData): Promise<void>;
   deleteTask(id: string): Promise<void>;
+  updateOrder(taskIds: string[], date: number): Promise<void>;
 }
 
 const TASKS_KEY = "TASKS";
@@ -67,6 +68,7 @@ async function loadTasks(): Promise<TaskData[]> {
     dueDate: task.dueDate,
     completed: task.completed,
     tags: task.tags || [],
+    order: task.order ?? 0,
   }));
 
   return tasks;
@@ -127,6 +129,24 @@ export const AsyncTaskPersistence: TaskPersistence = {
     const tasks = await loadTasks();
     const updatedTasks = tasks.filter((task) => task.id !== id);
     await saveTasks(updatedTasks);
+    await syncToWidget();
+  },
+  async updateOrder(taskIds: string[], date: number) {
+    const tasks = await loadTasks();
+
+    const targetDateTasks = tasks.filter((task) => task.dueDate === date);
+    const otherTasks = tasks.filter((task) => task.dueDate !== date);
+
+    const taskMap = new Map(targetDateTasks.map((task) => [task.id, task]));
+
+    const reorderedTasks = taskIds.map((id, index) => {
+      const task = taskMap.get(id);
+      if (!task) throw new Error(`Task with id ${id} not found`);
+      return { ...task, order: index + 1 };
+    });
+
+    const allTasks = [...otherTasks, ...reorderedTasks];
+    await saveTasks(allTasks);
     await syncToWidget();
   },
 };

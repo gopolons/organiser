@@ -12,7 +12,7 @@ import { useState } from "react";
 export default function useAssistantTabViewModel(
   recordingService: RecordingService,
   aiService: AIService,
-  persistence: TaskPersistence
+  persistence: TaskPersistence,
 ) {
   // Declare loading state variables
   const [loading, setLoading] = useState(false);
@@ -69,6 +69,8 @@ export default function useAssistantTabViewModel(
         description: task.description || "",
         dueDate: convertFromISO8601(task.dueDate),
         completed: false,
+        tags: [],
+        order: 0,
       }));
 
       return {

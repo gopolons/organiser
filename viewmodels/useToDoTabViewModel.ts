@@ -41,5 +41,26 @@ export default function useToDoTabViewModel(persistence: TaskPersistence) {
     return { success: true };
   };
 
-  return { fetchIncompleteTasksFromPersistence, toggleTaskStatus, loading };
+  // Function for updating task order & handling errors appropriately
+  const updateTasksOrder = async (taskIds: string[], date: number) => {
+    setLoading(true);
+    try {
+      await persistence.updateOrder(taskIds, date);
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : String(error),
+      };
+    } finally {
+      setLoading(false);
+    }
+    return { success: true };
+  };
+
+  return {
+    fetchIncompleteTasksFromPersistence,
+    toggleTaskStatus,
+    updateTasksOrder,
+    loading,
+  };
 }

@@ -12,7 +12,13 @@ import { useTheme } from "@/utils/theme";
 import useToDoTabViewModel from "@/viewmodels/useToDoTabViewModel";
 import { useFocusEffect, useRouter, useNavigation } from "expo-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Alert, SectionList, Text, View } from "react-native";
+import { Alert, Text, View, FlatList } from "react-native";
+import {
+  NestableDraggableFlatList,
+  NestableScrollContainer,
+  RenderItemParams,
+  ScaleDecorator,
+} from "react-native-draggable-flatlist";
 import {
   SafeAreaProvider,
   SafeAreaView,
@@ -20,6 +26,7 @@ import {
 } from "react-native-safe-area-context";
 import FilterButton from "@/components/filterButton";
 import FilterSheet from "@/components/filterSheet";
+import { getStartOfToday } from "@/utils/dateUtils";
 
 // Tab where the user can see their upcoming to do tasks
 export default function ToDoTab() {
@@ -42,11 +49,15 @@ export default function ToDoTab() {
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
   // View model variables for fetching and manipulating data
-  const { fetchIncompleteTasksFromPersistence, toggleTaskStatus, loading } =
-    useToDoTabViewModel(
-      // NOTE: Can be replaced with DummyTaskPersistence for debug purposes
-      AsyncTaskPersistence,
-    );
+  const {
+    fetchIncompleteTasksFromPersistence,
+    toggleTaskStatus,
+    updateTasksOrder,
+    loading,
+  } = useToDoTabViewModel(
+    // NOTE: Can be replaced with DummyTaskPersistence for debug purposes
+    AsyncTaskPersistence,
+  );
 
   // Function for fetching task data from view model
   async function fetchData() {
@@ -97,6 +108,23 @@ export default function ToDoTab() {
     }
   }
 
+  // Function for updating task order in persistence - only used for today's date
+  async function updateOrder(data: TaskData[]) {
+    const taskIds = data.map((task) => {
+      return task.id;
+    });
+
+    const response = await updateTasksOrder(taskIds, getStartOfToday());
+    if (response.success) {
+      fetchData();
+    } else {
+      Alert.alert(
+        "Error updating task order!",
+        response.error || "Something went wrong, please try again later.",
+      );
+    }
+  }
+
   // Function for showing task details
   async function showTaskDetails(id: string) {
     router.push({
@@ -141,6 +169,30 @@ export default function ToDoTab() {
     );
   }
 
+  // Prepare sections
+  const sections = useMemo(
+    () => groupUpcomingTasksByDate(filteredTasks),
+    [filteredTasks],
+  );
+
+  // Handle drag end for today's tasks
+  const onTodayDragEnd = useCallback(
+    async ({ data }: { data: TaskData[] }) => {
+      // Optimistically update local order
+      const idToOrder = new Map<string, number>(
+        data.map((task, index) => [task.id, index]),
+      );
+      setTasks((prev) =>
+        prev.map((t) =>
+          idToOrder.has(t.id) ? { ...t, order: idToOrder.get(t.id)! } : t,
+        ),
+      );
+
+      await updateOrder(data);
+    },
+    [setTasks],
+  );
+
   return (
     <SafeAreaProvider>
       <SafeAreaView style={globalStyles.container}>
@@ -154,34 +206,66 @@ export default function ToDoTab() {
           onClose={() => setFilterVisible(false)}
         />
 
-        <SectionList
-          key={filteredTasks.length === 0 ? "empty" : "populated"}
-          sections={groupUpcomingTasksByDate(filteredTasks)}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <TaskCell
-              task={item}
-              toggleCompletionStatus={() => updateTaskStatus(item.id)}
-              showTaskDetails={() => showTaskDetails(item.id)}
-            />
-          )}
-          renderSectionHeader={({ section: { title } }) => (
-            <Text style={tableComponentsStyles.sectionHeader}>{title}</Text>
-          )}
-          contentContainerStyle={
-            !filteredTasks.length
-              ? { flex: 1, justifyContent: "center" }
-              : { paddingBottom: 80 }
-          }
-          ListEmptyComponent={() => (
+        {!filteredTasks.length ? (
+          <View style={{ flex: 1, justifyContent: "center" }}>
             <EmptyListView
               title="No Upcoming Tasks!"
               description="You're all up to date"
               iconName="trophy"
             />
-          )}
-          scrollEnabled={!!filteredTasks.length}
-        />
+          </View>
+        ) : (
+          <NestableScrollContainer
+            contentContainerStyle={{ paddingBottom: 80 }}
+          >
+            {sections.map((section) => (
+              <View key={section.title}>
+                <Text style={tableComponentsStyles.sectionHeader}>
+                  {section.title}
+                </Text>
+                {section.title === "Today" && selectedTags.length === 0 ? (
+                  <NestableDraggableFlatList
+                    data={[...section.data].sort(
+                      (a, b) => (a.order ?? 0) - (b.order ?? 0),
+                    )}
+                    keyExtractor={(item) => item.id}
+                    onDragEnd={onTodayDragEnd}
+                    activationDistance={8}
+                    renderItem={({
+                      item,
+                      drag,
+                    }: RenderItemParams<TaskData>) => (
+                      <ScaleDecorator>
+                        <TaskCell
+                          task={item}
+                          toggleCompletionStatus={() =>
+                            updateTaskStatus(item.id)
+                          }
+                          showTaskDetails={() => showTaskDetails(item.id)}
+                          onLongPress={drag}
+                        />
+                      </ScaleDecorator>
+                    )}
+                    scrollEnabled={false}
+                  />
+                ) : (
+                  <FlatList
+                    data={section.data}
+                    keyExtractor={(item) => item.id}
+                    renderItem={({ item }) => (
+                      <TaskCell
+                        task={item}
+                        toggleCompletionStatus={() => updateTaskStatus(item.id)}
+                        showTaskDetails={() => showTaskDetails(item.id)}
+                      />
+                    )}
+                    scrollEnabled={false}
+                  />
+                )}
+              </View>
+            ))}
+          </NestableScrollContainer>
+        )}
       </SafeAreaView>
     </SafeAreaProvider>
   );

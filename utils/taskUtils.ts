@@ -104,3 +104,9 @@ export function toggleTaskCompletedOnView(
     task.id === id ? { ...task, completed: !task.completed } : task,
   );
 }
+
+export const filterCompletedTasks = (tasks: TaskData[]): TaskData[] =>
+  tasks.filter((task) => task.completed);
+
+export const filterIncompletedTasks = (tasks: TaskData[]): TaskData[] =>
+  tasks.filter((task) => !task.completed);

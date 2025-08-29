@@ -1,6 +1,10 @@
 import { TaskData } from "@/model/task";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { WidgetService } from "./widgetSync";
+import {
+  filterCompletedTasks,
+  filterIncompletedTasks,
+} from "@/utils/taskUtils";
 
 // Inteface which persistence providers will have to implement
 export interface TaskPersistence {
@@ -85,12 +89,12 @@ export const AsyncTaskPersistence: TaskPersistence = {
 
   async getIncompleteTasks() {
     const tasks = await loadTasks();
-    return tasks.filter((task) => !task.completed);
+    return filterIncompletedTasks(tasks);
   },
 
   async getCompletedTasks() {
     const tasks = await loadTasks();
-    return tasks.filter((task) => task.completed);
+    return filterCompletedTasks(tasks);
   },
 
   async toggleTaskStatus(id: string) {

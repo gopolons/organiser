@@ -1,4 +1,4 @@
-export type TaskData = {
+export interface TaskData {
   id: string;
   name: string;
   description: string;
@@ -6,9 +6,9 @@ export type TaskData = {
   completed: boolean;
   tags: string[];
   order: number;
-};
+}
 
-export type TaskSection = {
+export interface TaskSection {
   title: string;
   data: TaskData[];
-};
+}

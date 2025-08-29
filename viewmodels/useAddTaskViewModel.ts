@@ -4,7 +4,19 @@ import { randomUUID } from "expo-crypto";
 import { useState } from "react";
 import "react-native-get-random-values";
 
-export default function useAddTaskViewModel(persistence: TaskPersistence) {
+export interface AddTaskViewModel {
+  addNewTaskToPersistence(
+    name: string,
+    description: string,
+    dueDate: number,
+    tags: string[],
+  ): Promise<{ success: boolean; data?: string; error?: string }>;
+  loading: boolean;
+}
+
+export default function useAddTaskViewModel(
+  persistence: TaskPersistence,
+): AddTaskViewModel {
   // Variables for keeping track of loading state
   const [loading, setLoading] = useState(false);
 

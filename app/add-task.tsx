@@ -1,13 +1,14 @@
 import { AppButton } from "@/components/appButton";
 import { InputField } from "@/components/inputField";
+import { FormSubmitHandler } from "@/model/FormTypes";
 import { AsyncTaskPersistence } from "@/services/persistence";
 import { createAddNewTaskStyles } from "@/styles/addNewTaskStyles";
 import { convertToISO8601 } from "@/utils/dateUtils";
 import { useTheme } from "@/utils/theme";
 import useAddTaskViewModel from "@/viewmodels/useAddTaskViewModel";
+import { useTaskForm } from "@/viewmodels/useTaskForm";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { useState } from "react";
 import {
   Alert,
   KeyboardAvoidingView,
@@ -28,11 +29,7 @@ export default function AddTaskView() {
   const addNewTaskStyles = createAddNewTaskStyles(theme);
 
   // State task variables which will be used for collecting user input
-  const [title, setTitle] = useState<string>("");
-  const [description, setDescription] = useState<string>("");
-  const [dueDate, setDueDate] = useState<number>(Date.now());
-  const [tags, setTags] = useState<string[]>([]);
-  const [tagText, setTagText] = useState<string>("");
+  const { formState, validation, handlers } = useTaskForm();
 
   // View model variables for fetching and manipulating data
   const { addNewTaskToPersistence, loading } = useAddTaskViewModel(
@@ -41,18 +38,22 @@ export default function AddTaskView() {
   );
 
   // A function for saving the task into the persistent storage via view model
-  async function saveTask() {
-    if (!title.trim()) {
-      Alert.alert("Missing Title", "Please enter a title for your task.");
+  const saveTask: FormSubmitHandler = async (formData) => {
+    if (!validation.isValid) {
+      Alert.alert(
+        "Missing title",
+        validation.fieldErrors.title || "Please enter a title for your task.",
+      );
       return;
     }
 
     const response = await addNewTaskToPersistence(
-      title,
-      description,
-      dueDate,
-      tags,
+      formData.name,
+      formData.description,
+      formData.dueDate,
+      formData.tags,
     );
+
     if (response.success && response.data) {
       // Redirect the user to the page with new task details
       router.replace({
@@ -65,37 +66,7 @@ export default function AddTaskView() {
         response.error || "Something went wrong. Please try again later.",
       );
     }
-  }
-
-  // Tag helpers
-  function commitTagsFromText(text: string) {
-    const newTags = text.trim().split(/\s+/).filter(Boolean);
-    if (newTags.length === 0) return;
-    setTags((prev) => Array.from(new Set([...prev, ...newTags])));
-  }
-
-  function handleTagInputChange(text: string) {
-    if (/\s$/.test(text)) {
-      commitTagsFromText(text);
-      setTagText("");
-    } else {
-      setTagText(text);
-    }
-  }
-
-  function handleTagSubmit() {
-    if (tagText.trim().length > 0) {
-      commitTagsFromText(tagText + " ");
-      setTagText("");
-    }
-  }
-
-  function removeTag(tagToRemove: string) {
-    setTags((prev) => prev.filter((t) => t !== tagToRemove));
-  }
-
-  // A quick FLV check to see if the form is valid
-  const isFormValid = title.trim().length > 0;
+  };
 
   return (
     <SafeAreaProvider>
@@ -123,19 +94,27 @@ export default function AddTaskView() {
             <View style={addNewTaskStyles.inputSection}>
               <Text style={addNewTaskStyles.inputLabel}>Task Title *</Text>
               <InputField
-                value={title}
-                onChangeText={setTitle}
+                value={formState.name}
+                onChangeText={handlers.setName}
                 placeholder="Enter task title..."
                 returnKeyType="next"
               />
+              {/* {Field specific error} */}
+              {validation.fieldErrors.title && (
+                <Text
+                  style={{ color: theme.error, fontSize: 12, marginTop: 4 }}
+                >
+                  {validation.fieldErrors.title}
+                </Text>
+              )}
             </View>
 
             {/* Description Input */}
             <View style={addNewTaskStyles.inputSection}>
               <Text style={addNewTaskStyles.inputLabel}>Description</Text>
               <InputField
-                value={description}
-                onChangeText={setDescription}
+                value={formState.description}
+                onChangeText={handlers.setDescription}
                 placeholder="Enter task description (optional)..."
                 multiline={true}
                 numberOfLines={4}
@@ -146,22 +125,22 @@ export default function AddTaskView() {
             <View style={addNewTaskStyles.inputSection}>
               <Text style={addNewTaskStyles.inputLabel}>Tags</Text>
               <InputField
-                value={tagText}
-                onChangeText={handleTagInputChange}
-                onSubmitEditing={handleTagSubmit}
+                value={formState.tagText}
+                onChangeText={handlers.handleTagInput}
+                onSubmitEditing={handlers.handleTagSubmit}
                 placeholder="Type a tag and press space"
                 returnKeyType="done"
               />
-              {tags.length > 0 && (
+              {formState.tags.length > 0 && (
                 <View style={addNewTaskStyles.tagsContainer}>
-                  {tags.map((tag) => (
+                  {formState.tags.map((tag) => (
                     <View key={tag} style={addNewTaskStyles.tagChip}>
                       <Text style={addNewTaskStyles.tagText}>{tag}</Text>
                       <Ionicons
                         name="close"
                         size={14}
                         color={theme.textTertiary}
-                        onPress={() => removeTag(tag)}
+                        onPress={() => handlers.removeTag(tag)}
                         style={addNewTaskStyles.tagRemoveIcon}
                       />
                     </View>
@@ -178,10 +157,10 @@ export default function AddTaskView() {
                 <Calendar
                   firstDay={1}
                   onDayPress={(day) => {
-                    setDueDate(day.timestamp);
+                    handlers.setDueDate(day.timestamp);
                   }}
                   markedDates={{
-                    [convertToISO8601(dueDate)]: {
+                    [convertToISO8601(formState.dueDate)]: {
                       selected: true,
                       marked: true,
                       selectedColor: theme.primary,
@@ -216,22 +195,26 @@ export default function AddTaskView() {
             <View style={addNewTaskStyles.actionSection}>
               <AppButton
                 title={loading ? "Adding task..." : "Create Task"}
-                onPress={saveTask}
-                disabled={!isFormValid || loading}
+                onPress={() => saveTask(formState)}
+                disabled={!validation.isValid || loading}
               />
             </View>
 
             {/* Form Validation Hint */}
-            {!isFormValid && (
+            {!validation.isValid && (
               <View style={addNewTaskStyles.validationHint}>
                 <Ionicons
                   name="information-circle"
                   size={20}
                   color={theme.warning}
                 />
-                <Text style={addNewTaskStyles.validationText}>
-                  Please enter a task title to continue
-                </Text>
+                <View>
+                  {validation.errors.map((error, index) => (
+                    <Text key={index} style={addNewTaskStyles.validationText}>
+                      {error}
+                    </Text>
+                  ))}
+                </View>
               </View>
             )}
           </ScrollView>

@@ -1,11 +1,12 @@
 import { AppButton } from "@/components/appButton";
-import { TaskData } from "@/model/task";
 import { InputField } from "@/components/inputField";
+import { TaskData } from "@/model/task";
 import { AsyncTaskPersistence } from "@/services/persistence";
 import { createTaskDetailsStyles } from "@/styles/taskDetailsStyles";
 import { convertToISO8601, isOverdue } from "@/utils/dateUtils";
 import { useTheme } from "@/utils/theme";
 import useTaskDetailsViewModel from "@/viewmodels/useTaskDetailsViewModel";
+import { useTaskForm } from "@/viewmodels/useTaskForm";
 import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
@@ -31,34 +32,22 @@ export default function TaskDetailsView() {
   const { taskID } = useLocalSearchParams<{ taskID: string }>();
 
   // State task variables which will be used for collecting user input
-  const [task, setTask] = useState<TaskData | null>(null);
-  const [name, setName] = useState<string>("");
-  const [description, setDescription] = useState<string>("");
-  const [dueDate, setDueDate] = useState<number>(Date.now());
-  const [tags, setTags] = useState<string[]>([]);
-  const [tagText, setTagText] = useState<string>("");
+  const { formState, validation, handlers } = useTaskForm();
+  const [initialTask, setInitialTask] = useState<TaskData | null>(null);
 
   // View model variables for fetching and manipulating data
-  const {
-    fetchTaskById,
-    toggleTaskStatus,
-    updateTaskDetails,
-    deleteTask,
-    loading,
-  } = useTaskDetailsViewModel(
-    // NOTE: Can be replaced with DummyTaskPersistence for debug purposes
-    AsyncTaskPersistence,
-  );
+  const { fetchTaskById, updateTaskDetails, deleteTask, loading } =
+    useTaskDetailsViewModel(
+      // NOTE: Can be replaced with DummyTaskPersistence for debug purposes
+      AsyncTaskPersistence,
+    );
 
   // Function for fetching task details from persistence
   async function fetchTaskDetails() {
     const response = await fetchTaskById(taskID);
     if (response.success && response.data) {
-      setTask(response.data);
-      setName(response.data.name);
-      setDescription(response.data.description);
-      setDueDate(response.data.dueDate);
-      setTags(response.data.tags);
+      setInitialTask(response.data);
+      handlers.populateData(response.data);
     } else {
       Alert.alert(
         "Error Fetching Task Details!",
@@ -77,13 +66,20 @@ export default function TaskDetailsView() {
 
   // Function for storing updated task details in persistence
   async function storeTaskDetails() {
-    // Check if task exists
-    if (!task) return;
-    // Update task details in state
-    task.name = name;
-    task.description = description;
-    task.dueDate = dueDate;
-    task.tags = tags;
+    // Check if task is valid
+    if (!validation.isValid) return;
+    if (!initialTask) return;
+
+    const task: TaskData = {
+      id: initialTask.id,
+      name: formState.name,
+      description: formState.description,
+      dueDate: formState.dueDate,
+      completed: formState.completed,
+      tags: formState.tags,
+      order: initialTask.order,
+    };
+
     // Update task details in persistence
     const response = await updateTaskDetails(task);
     if (!response.success) {
@@ -94,27 +90,9 @@ export default function TaskDetailsView() {
     }
   }
 
-  // Function to toggle task completion status
-  async function handleToggleStatus() {
-    if (!task) return;
-    const response = await toggleTaskStatus(task.id);
-    if (response.success) {
-      // Fetch the updated task to get the new status
-      const updatedTaskResponse = await fetchTaskById(task.id);
-      if (updatedTaskResponse.success && updatedTaskResponse.data) {
-        setTask(updatedTaskResponse.data);
-      }
-    } else {
-      Alert.alert(
-        "Error Updating Task Status!",
-        response.error || "Something went wrong. Please try again later.",
-      );
-    }
-  }
-
   // Function to delete task
   async function handleDeleteTask() {
-    if (!task) return;
+    if (!initialTask) return;
 
     Alert.alert(
       "Delete Task",
@@ -128,7 +106,7 @@ export default function TaskDetailsView() {
           text: "Delete",
           style: "destructive",
           onPress: async () => {
-            const response = await deleteTask(task.id);
+            const response = await deleteTask(initialTask.id);
             if (response.success) {
               router.back();
             } else {
@@ -144,47 +122,14 @@ export default function TaskDetailsView() {
     );
   }
 
-  // Tag helpers
-  function commitTagsFromText(text: string) {
-    const newTags = text.trim().split(/\s+/).filter(Boolean);
-    if (newTags.length === 0) return;
-    setTags((prev) => Array.from(new Set([...prev, ...newTags])));
-  }
-
-  function handleTagInputChange(text: string) {
-    if (/\s$/.test(text)) {
-      commitTagsFromText(text);
-      setTagText("");
-    } else {
-      setTagText(text);
-    }
-  }
-
-  function handleTagSubmit() {
-    if (tagText.trim().length > 0) {
-      commitTagsFromText(tagText + " ");
-      setTagText("");
-    }
-  }
-
-  function removeTag(tagToRemove: string) {
-    setTags((prev) => prev.filter((t) => t !== tagToRemove));
-  }
-
-  function beginEditTag(tagToEdit: string) {
-    // Move tag into input for editing
-    setTags((prev) => prev.filter((t) => t !== tagToEdit));
-    setTagText(tagToEdit);
-  }
-
   // Function to get status text and color
   function getStatusInfo() {
-    if (!task)
+    if (!initialTask)
       return { text: "Loading...", color: taskDetailsStyles.statusText };
 
-    if (task.completed) {
+    if (formState.completed) {
       return { text: "Completed", color: taskDetailsStyles.completedStatus };
-    } else if (isOverdue(task.dueDate)) {
+    } else if (isOverdue(formState.dueDate)) {
       return { text: "Overdue", color: taskDetailsStyles.overdueStatus };
     } else {
       return { text: "Pending", color: taskDetailsStyles.pendingStatus };
@@ -198,12 +143,16 @@ export default function TaskDetailsView() {
 
   // Store updated task details when task changes
   useEffect(() => {
-    if (task) {
-      storeTaskDetails();
-    }
-  }, [name, description, dueDate, tags]);
+    const timeoutId = setTimeout(() => {
+      if (formState && initialTask) {
+        storeTaskDetails();
+      }
+    }, 500);
 
-  if (!task) {
+    return () => clearTimeout(timeoutId);
+  }, [formState]);
+
+  if (!initialTask) {
     return (
       <SafeAreaProvider>
         <SafeAreaView style={taskDetailsStyles.container}>
@@ -247,14 +196,22 @@ export default function TaskDetailsView() {
                 />
                 <TextInput
                   style={taskDetailsStyles.taskTitle}
-                  value={name}
-                  onChangeText={setName}
+                  value={formState.name}
+                  onChangeText={handlers.setName}
                   placeholder="Enter task name..."
                   placeholderTextColor={taskDetailsStyles.placeholderText.color}
                   editable={true}
                   multiline={true}
                   textAlignVertical="top"
                 />
+                {/* {Field specific error} */}
+                {validation.fieldErrors.title && (
+                  <Text
+                    style={{ color: theme.error, fontSize: 12, marginTop: 4 }}
+                  >
+                    {validation.fieldErrors.title}
+                  </Text>
+                )}
               </View>
 
               <View style={taskDetailsStyles.descriptionRow}>
@@ -266,8 +223,8 @@ export default function TaskDetailsView() {
                 />
                 <TextInput
                   style={taskDetailsStyles.taskDescription}
-                  value={description}
-                  onChangeText={setDescription}
+                  value={formState.description}
+                  onChangeText={handlers.setDescription}
                   placeholder="Add description..."
                   placeholderTextColor={taskDetailsStyles.placeholderText.color}
                   editable={true}
@@ -284,17 +241,21 @@ export default function TaskDetailsView() {
             <View style={taskDetailsStyles.statusSection}>
               <TouchableOpacity
                 style={taskDetailsStyles.statusButton}
-                onPress={handleToggleStatus}
+                onPress={() => handlers.setCompletion(!formState.completed)}
                 disabled={loading}
               >
                 <View style={taskDetailsStyles.statusContent}>
                   <Ionicons
                     name={
-                      task.completed ? "checkmark-circle" : "ellipse-outline"
+                      formState.completed
+                        ? "checkmark-circle"
+                        : "ellipse-outline"
                     }
                     size={20}
                     color={
-                      task.completed ? theme.completed : theme.textSecondary
+                      formState.completed
+                        ? theme.completed
+                        : theme.textSecondary
                     }
                   />
                   <Text
@@ -308,19 +269,19 @@ export default function TaskDetailsView() {
               <View style={{ marginTop: 12 }}>
                 <Text style={taskDetailsStyles.fieldLabel}>Tags</Text>
                 <InputField
-                  value={tagText}
-                  onChangeText={handleTagInputChange}
-                  onSubmitEditing={handleTagSubmit}
+                  value={formState.tagText}
+                  onChangeText={handlers.handleTagInput}
+                  onSubmitEditing={handlers.handleTagSubmit}
                   placeholder="Type a tag and press space"
                   returnKeyType="done"
                 />
-                {tags.length > 0 && (
+                {formState.tags.length > 0 && (
                   <View style={taskDetailsStyles.tagsContainer}>
-                    {tags.map((tag) => (
+                    {formState.tags.map((tag) => (
                       <View key={tag} style={taskDetailsStyles.tagChip}>
                         <Text
                           style={taskDetailsStyles.tagText}
-                          onPress={() => beginEditTag(tag)}
+                          onPress={() => handlers.removeTag(tag)}
                         >
                           {tag}
                         </Text>
@@ -328,7 +289,7 @@ export default function TaskDetailsView() {
                           name="close"
                           size={14}
                           color={theme.textTertiary}
-                          onPress={() => removeTag(tag)}
+                          onPress={() => handlers.removeTag(tag)}
                           style={taskDetailsStyles.tagRemoveIcon}
                         />
                       </View>
@@ -345,10 +306,10 @@ export default function TaskDetailsView() {
                 <Calendar
                   firstDay={1}
                   onDayPress={(day) => {
-                    setDueDate(day.timestamp);
+                    handlers.setDueDate(day.timestamp);
                   }}
                   markedDates={{
-                    [convertToISO8601(dueDate)]: {
+                    [convertToISO8601(formState.dueDate)]: {
                       selected: true,
                       marked: true,
                       selectedColor: theme.primary,
